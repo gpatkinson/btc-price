@@ -40,7 +40,7 @@ omarchy plugin remove io.github.gpatkinson.btc-price
   ```
   The 15-minute poll interval stays well within CoinGecko's free-tier rate limit.
 
-No sudo, pkexec, or elevated privileges are required. The plugin does not modify user configuration without explicit consent. Color preference is written to `~/.local/state/omarchy/settings/btc-price.json`.
+No elevated privileges are required. The plugin does not modify user configuration without explicit consent. Color preference is written to `~/.local/state/omarchy/settings/btc-price.json`.
 
 ## Files
 
