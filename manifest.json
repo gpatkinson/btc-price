@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "gpatkinson.btc-price",
+  "id": "io.github.gpatkinson.btc-price",
   "name": "BTC Price",
   "version": "1.0.0",
   "author": "George Patkinson",

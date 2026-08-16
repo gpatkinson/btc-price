@@ -7,7 +7,7 @@ import "Model.js" as Model
 
 Panel {
   id: root
-  moduleName: "gpatkinson.btc-price"
+  moduleName: "io.github.gpatkinson.btc-price"
   manageIpc: false
 
   property var anchorItem: null
