@@ -51,14 +51,54 @@ Panel {
   // Retry budget for transient failures (network down, API 429, etc.).
   property int retries: 0
 
-  // CoinGecko free /simple/price endpoint — no API key required.
-  // Rate limit is generous for a 15-minute poll; CoinGecko asks for a
-  // courtesy delay of ~1-2 min between calls on the free tier.
-  readonly property string apiUrl:
-    "https://api.coingecko.com/api/v3/simple/price"
-    + "?ids=bitcoin&vs_currencies=usd"
-    + "&include_24hr_change=true"
-    + "&include_last_updated_at=true"
+  // ---- Color configuration ----
+
+  // The user-configured bar label color. Read by BarWidget.qml via the
+  // panel loader item. Defaults to bitcoin orange (#f7931a).
+  property string priceColor: "#f7931a"
+
+  // State file path for persisted color preference.
+  readonly property string stateFile:
+    Quickshell.env("HOME") + "/.local/state/omarchy/settings/btc-price.json"
+
+  // Read the color state file on startup and when it changes on disk.
+  property FileView colorFile: FileView {
+    path: root.stateFile
+    watchChanges: true
+    printErrors: false
+    onFileChanged: reload()
+    onLoaded: {
+      var color = Model.parseColorFile(text())
+      if (color) root.priceColor = color
+    }
+    onLoadFailed: {
+      // No saved preference — keep the manifest default (bitcoin orange).
+    }
+  }
+
+  // One delayed reload after shell startup to catch a race where the
+  // first read happens before the file system is ready.
+  Timer {
+    interval: 1500
+    running: true
+    onTriggered: colorFile.reload()
+  }
+
+  // Cycle to the next preset color and persist it.
+  function cycleColor() {
+    var next = Model.nextColor(priceColor)
+    priceColor = next
+    persistColor(next)
+  }
+
+  // Write the color preference to the state file.
+  function persistColor(color) {
+    colorSaveProc.command = ["sh", "-c",
+      "mkdir -p \"" + root.stateFile.replace(/\/[^\/]+$/, "") + "\""
+      + " && printf '{\"color\":\"" + color + "\"}' > \"" + root.stateFile + "\""
+    ]
+    colorSaveProc.running = true
+  }
 
   // ---- Fetch logic ----
 
@@ -81,6 +121,13 @@ Panel {
   readonly property string displayChange: Model.formatChange(change24h)
   readonly property color  displayChangeColor: Model.changeColor(change24h)
   readonly property string displayUpdated: Model.formatUpdatedTime(lastUpdated)
+
+  // CoinGecko free /simple/price endpoint — no API key required.
+  readonly property string apiUrl:
+    "https://api.coingecko.com/api/v3/simple/price"
+    + "?ids=bitcoin&vs_currencies=usd"
+    + "&include_24hr_change=true"
+    + "&include_last_updated_at=true"
 
   // ---- HTTP fetch via curl (same pattern as the built-in weather plugin) ----
 
@@ -133,6 +180,11 @@ Panel {
     onTriggered: root.refresh()
   }
 
+  // Process for writing the color preference to disk.
+  Process {
+    id: colorSaveProc
+  }
+
   // ---- Panel surface ----
 
   KeyboardPanel {
@@ -167,14 +219,61 @@ Panel {
           font.bold: true
         }
 
-        // ---- Current price (large) ----
+        // ---- Current price (large, click to cycle color) ----
 
         Text {
           width: parent.width
           text: root.displayPrice || (root.loading ? "Loading..." : "—")
-          color: root.barForeground
+          color: root.priceColor
           font.family: root.bar ? root.bar.fontFamily : Style.font.family
           font.pixelSize: Style.font.displayLarge
+
+          MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.cycleColor()
+          }
+        }
+
+        // ---- Color hint ----
+
+        Text {
+          width: parent.width
+          text: "Click price to change color"
+          color: root.barForeground
+          opacity: 0.4
+          font.family: root.bar ? root.bar.fontFamily : Style.font.family
+          font.pixelSize: Style.font.caption
+        }
+
+        // ---- Color preset swatches ----
+
+        Row {
+          width: parent.width
+          spacing: Style.space(6)
+          layoutDirection: Qt.LeftToRight
+
+          Repeater {
+            model: Model.colorPresets
+
+            delegate: Rectangle {
+              width: Style.space(20)
+              height: Style.space(20)
+              radius: Style.space(4)
+              color: modelData
+              border.width: priceColor.toLowerCase() === modelData.toLowerCase() ? 2 : 0
+              border.color: root.barForeground
+
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                  root.priceColor = modelData
+                  root.persistColor(modelData)
+                }
+              }
+            }
+          }
         }
 
         // ---- 24h change ----
