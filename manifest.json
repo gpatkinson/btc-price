@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "gpatkinson.bitcoin-price",
+  "name": "Bitcoin Price",
+  "version": "1.0.0",
+  "author": "George Patkinson",
+  "license": "MIT",
+  "description": "Live Bitcoin price in USD for the Omarchy bar. Polls CoinGecko every 15 minutes; click for a details panel with 24h change and last-updated time.",
+  "kinds": ["bar-widget"],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Bitcoin Price",
+    "category": "Finance",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}
