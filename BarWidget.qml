@@ -67,7 +67,7 @@ BarWidget {
     anchors.fill: parent
     bar: root.bar
     text: panelLoader.item ? panelLoader.item.label : ""
-    // Use the user-configured color (bitcoin orange by default) for the bar label.
+    // Bitcoin orange or bar default, toggled from the panel.
     foreground: panelLoader.item && panelLoader.item.priceColor
       ? panelLoader.item.priceColor
       : (root.bar ? root.bar.barForeground : "#f7931a")

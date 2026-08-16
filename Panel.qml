@@ -53,49 +53,52 @@ Panel {
 
   // ---- Color configuration ----
 
-  // The user-configured bar label color. Read by BarWidget.qml via the
-  // panel loader item. Defaults to bitcoin orange (#f7931a).
-  property string priceColor: "#f7931a"
+  // Two options: bitcoin orange (#f7931a) or the bar's default foreground.
+  // useOrange defaults true so the bar shows orange unless the user toggles.
+  property bool useOrange: true
 
-  // State file path for persisted color preference.
+  // The effective color string, read by BarWidget.qml via the panel loader.
+  readonly property string priceColor: useOrange
+    ? "#f7931a"
+    : (root.bar ? String(root.bar.barForeground) : "#f7931a")
+
+  // State file path for persisted preference.
   readonly property string stateFile:
     Quickshell.env("HOME") + "/.local/state/omarchy/settings/btc-price.json"
 
-  // Read the color state file on startup and when it changes on disk.
+  // Read the state file on startup and when it changes on disk.
   property FileView colorFile: FileView {
     path: root.stateFile
     watchChanges: true
     printErrors: false
     onFileChanged: reload()
     onLoaded: {
-      var color = Model.parseColorFile(text())
-      if (color) root.priceColor = color
+      var pref = Model.parseColorFile(text())
+      if (pref !== null) root.useOrange = pref
     }
     onLoadFailed: {
-      // No saved preference — keep the manifest default (bitcoin orange).
+      // No saved preference — keep the default (orange).
     }
   }
 
-  // One delayed reload after shell startup to catch a race where the
-  // first read happens before the file system is ready.
+  // One delayed reload after shell startup to catch a first-read race.
   Timer {
     interval: 1500
     running: true
     onTriggered: colorFile.reload()
   }
 
-  // Cycle to the next preset color and persist it.
-  function cycleColor() {
-    var next = Model.nextColor(priceColor)
-    priceColor = next
-    persistColor(next)
+  // Toggle between orange and default, persist the choice.
+  function toggleColor() {
+    useOrange = !useOrange
+    persistColor(useOrange)
   }
 
-  // Write the color preference to the state file.
-  function persistColor(color) {
+  // Write the preference to the state file.
+  function persistColor(useOrangeValue) {
     colorSaveProc.command = ["sh", "-c",
       "mkdir -p \"" + root.stateFile.replace(/\/[^\/]+$/, "") + "\""
-      + " && printf '{\"color\":\"" + color + "\"}' > \"" + root.stateFile + "\""
+      + " && printf '{\"useOrange\":" + (useOrangeValue ? "true" : "false") + "}' > \"" + root.stateFile + "\""
     ]
     colorSaveProc.running = true
   }
@@ -219,7 +222,7 @@ Panel {
           font.bold: true
         }
 
-        // ---- Current price (large, click to cycle color) ----
+        // ---- Current price (large, click to toggle color) ----
 
         Text {
           width: parent.width
@@ -231,7 +234,7 @@ Panel {
           MouseArea {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
-            onClicked: root.cycleColor()
+            onClicked: root.toggleColor()
           }
         }
 
@@ -239,41 +242,13 @@ Panel {
 
         Text {
           width: parent.width
-          text: "Click price to change color"
+          text: root.useOrange
+            ? "Orange · click for default"
+            : "Default · click for orange"
           color: root.barForeground
           opacity: 0.4
           font.family: root.bar ? root.bar.fontFamily : Style.font.family
           font.pixelSize: Style.font.caption
-        }
-
-        // ---- Color preset swatches ----
-
-        Row {
-          width: parent.width
-          spacing: Style.space(6)
-          layoutDirection: Qt.LeftToRight
-
-          Repeater {
-            model: Model.colorPresets
-
-            delegate: Rectangle {
-              width: Style.space(20)
-              height: Style.space(20)
-              radius: Style.space(4)
-              color: modelData
-              border.width: priceColor.toLowerCase() === modelData.toLowerCase() ? 2 : 0
-              border.color: root.barForeground
-
-              MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                  root.priceColor = modelData
-                  root.persistColor(modelData)
-                }
-              }
-            }
-          }
         }
 
         // ---- 24h change ----

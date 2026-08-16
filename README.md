@@ -23,9 +23,8 @@ omarchy plugin add https://github.com/gpatkinson/btc-price.git --enable
 - The bar shows `₿$63,098` (Bitcoin symbol + formatted USD price) in bitcoin orange by default.
 - Click the bar widget to open the details panel.
 - The panel shows the current price, 24-hour change (green/red), last-updated time, and a manual refresh button.
-- Click the price text in the panel to cycle through preset colors (orange, white, green, blue, yellow, purple, cyan, red).
-- Or click a color swatch below the price to jump directly to a color.
-- The color choice persists across sessions in `~/.local/state/omarchy/settings/btc-price.json`.
+- Click the price text in the panel to toggle between bitcoin orange and the bar's default color.
+- The choice persists across sessions in `~/.local/state/omarchy/settings/btc-price.json`.
 - Press Escape to close the panel.
 
 ## Configure

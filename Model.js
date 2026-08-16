@@ -84,42 +84,17 @@ function formatUpdatedTime(timestamp) {
   return h + ":" + m
 }
 
-// ---- Color presets ----
+// ---- Color toggle ----
 
-// Preset colors the user can cycle through by clicking the price in the panel.
-// Bitcoin orange is first so the default matches the manifest default.
-var colorPresets = [
-  "#f7931a",  // Bitcoin orange
-  "#ffffff",  // White
-  "#4ade80",  // Green
-  "#60a5fa",  // Blue
-  "#facc15",  // Yellow
-  "#c084fc",  // Purple
-  "#22d3ee",  // Cyan
-  "#f87171"   // Red
-]
-
-// Find the next preset after the given color, wrapping around.
-function nextColor(current) {
-  var cur = String(current || "").toLowerCase()
-  for (var i = 0; i < colorPresets.length; i++) {
-    if (colorPresets[i].toLowerCase() === cur) {
-      return colorPresets[(i + 1) % colorPresets.length]
-    }
-  }
-  // If the current color isn't a preset, return to orange.
-  return colorPresets[0]
-}
-
-// Parse the btc-price.json state file: { "color": "#f7931a" }
-// Returns the color string, or empty string on failure.
+// Two options only: bitcoin orange or the bar's default foreground.
+// Parse the btc-price.json state file: { "useOrange": true }
+// Returns null if no preference is stored.
 function parseColorFile(raw) {
   try {
     var data = JSON.parse(String(raw || ""))
-    if (!data || typeof data.color !== "string") return ""
-    var c = data.color.replace(/^\s+|\s+$/g, "")
-    return c === "" ? "" : c
+    if (!data || data.useOrange === undefined || data.useOrange === null) return null
+    return data.useOrange === true
   } catch (e) {
-    return ""
+    return null
   }
 }

@@ -14,14 +14,6 @@
     "displayName": "BTC Price",
     "category": "Finance",
     "allowMultiple": false,
-    "defaultSection": "right",
-    "defaults": { "priceColor": "#f7931a" },
-    "schema": [
-      {
-        "key": "priceColor",
-        "type": "string",
-        "label": "Bar label color (hex)"
-      }
-    ]
+    "defaultSection": "right"
   }
 }
