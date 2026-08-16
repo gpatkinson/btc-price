@@ -4,7 +4,7 @@ import qs.Ui
 
 BarWidget {
   id: root
-  moduleName: "gpatkinson.bitcoin-price"
+  moduleName: "gpatkinson.btc-price"
 
   // ---- Panel lifecycle (forwarded to the loaded Panel.qml) ----
 

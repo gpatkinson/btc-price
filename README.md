@@ -1,4 +1,4 @@
-# Bitcoin Price
+# BTC Price
 
 A live Bitcoin price widget for the Omarchy Quattro bar. Shows the current BTC/USD price and polls CoinGecko's free API every 15 minutes. Click the bar widget for a details panel with 24-hour change and last-updated time.
 
@@ -15,7 +15,7 @@ The 15-minute poll interval stays well within CoinGecko's free-tier rate limit.
 ## Install
 
 ```sh
-omarchy plugin add https://github.com/gpatkinson/bitcoin-price-quicksync.git --enable
+omarchy plugin add https://github.com/gpatkinson/btc-price.git --enable
 ```
 
 ## Usage
@@ -30,13 +30,13 @@ omarchy plugin add https://github.com/gpatkinson/bitcoin-price-quicksync.git --e
 Move the widget to a different bar section:
 
 ```sh
-omarchy bar move gpatkinson.bitcoin-price --section right
+omarchy bar move gpatkinson.btc-price --section right
 ```
 
 ## Remove
 
 ```sh
-omarchy plugin remove gpatkinson.bitcoin-price
+omarchy plugin remove gpatkinson.btc-price
 ```
 
 ## Files

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "id": "gpatkinson.bitcoin-price",
-  "name": "Bitcoin Price",
+  "id": "gpatkinson.btc-price",
+  "name": "BTC Price",
   "version": "1.0.0",
   "author": "George Patkinson",
   "license": "MIT",
@@ -11,7 +11,7 @@
     "barWidget": "BarWidget.qml"
   },
   "barWidget": {
-    "displayName": "Bitcoin Price",
+    "displayName": "BTC Price",
     "category": "Finance",
     "allowMultiple": false,
     "defaultSection": "right"
